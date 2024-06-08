@@ -63,20 +63,8 @@ import {
             </Text>
 
             <Image style={styles.img} source={require('../assets/capa-home.png')} />
-
-          <TouchableOpacity 
-          style={styles.btnCriar}
-          onPress={()=>{ return('HomePage')}}
-          > 
-            <Text>Criar!!!</Text>
-          </TouchableOpacity>
-    
         </View>
 
-        
-  
-  
-  
       </View>
     );
   }

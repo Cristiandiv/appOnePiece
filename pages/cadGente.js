@@ -1,16 +1,35 @@
 import { useEffect, useState } from 'react';
-import { View, Image, FlatList, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, Image, TextInput, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { storage, fire } from "../Firebase";
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot } from 'firebase/firestore';
 import * as ImagePicker from "expo-image-picker";
+import { Firebase, storage, fire, dbstore } from '../Firebase';
 
-export default function Home() {
-    const [img, setImg] = useState("");
-    const [file, setFile] = useState("");
+export default function cadGente({ navigation }) {
+    const [nome, setNome] = useState(null);
+    const [vivoMorto, setVivoMorto] = useState(null);  
+    const [valor, setValor] = useState(null);
+    const [imgUrl, setImgUrl] = useState(null);
+
+    const [img, setImg] = useState('');
+    const [file, setFile] = useState([]);
+
+    function addDiario(){
+        Firebase.collection('onePiece2').add({
+            nome: nome,
+            vivoMorto: vivoMorto,
+            valor: valor,
+        });
+            setNome('')
+            setVivoMorto('')
+            setValor('')
+            Alert.alert('Cadastro', 'Recompensa cadastrada com sucesso');
+            navigation.navigate('Home')
+    }
+
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(fire, "files"), (snapshot) => {
+        const unsubscribe = onSnapshot(collection(fire, "onePiece"), (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     setFile((prevFiles) => [...prevFiles, change.doc.data()]);
@@ -23,97 +42,113 @@ export default function Home() {
     async function uploadImage(uri, fileType) {
         const response = await fetch(uri);
         const blob = await response.blob();
-        const storageRef = ref(storage, "");
+        const storageRef = ref(storage, new Date().toISOString());
         const uploadTask = uploadBytesResumable(storageRef, blob);
 
         uploadTask.on(
-            "state_changed",
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-                    await saveRecord(fileType, downloadURL, new Date().toISOString());
-                    setImg("");
+            'state_changed',
+            null,
+            (error) => {
+                console.error(error);
+            },
+
+            async() => {
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                await saveRecord(fileType, downloadURL, new Date().toISOString());
+                setImg("");
                 });
-            }
-        )
-    }
+            };
+    //}// se der erro habilita //
 
     async function saveRecord(fileType, url, createdAt) {
         try {
-            const docRef = await addDoc(collection, (fire, "files"), {
+            const docRef = await addDoc(collection(fire, "onePiece"), {
                 fileType,
                 url,
                 createdAt,
-            })
+            });
+
+            
         } catch (e) {
             console.log(e);
         }
     }
 
-    async function pickImage () {
+    async function pickImage() {
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
         });
-    
+
         if (!result.canceled) {
-          setImg(result.assets[0].uri);
-          await uploadImage(result.assets[0].uri, "image");
+            setImg(result.assets[0].uri);
+            await uploadImage(result.assets[0].uri, 'img');
         }
-      };
+    }
 
     return (
         <View style={estilo.container}>
-            <Text style={estilo.titulo}>Minhas Fotos Lindas</Text>
-            <FlatList
-            data={file}
-            keyExtractor={(item)=>item.url}
-            renderItem={({item}) => {
-                if(item.fileType === "img"){
-                    return (
-                        <Image 
-                            source={{uri:item.url}}
-                            style={estilo.fotos}
-                        />
-                    )
-                }
-            }
-            }
-            numColumns={2}
-            
-            />
+            <Text style={estilo.titulo}>Cadastro de Recompensas</Text>
+            <View style={estilo.container}>
 
+                <View>
+                    <TextInput 
+                        autoCapitalize='words' 
+                        style={estilo.input} 
+                        placeholder="Digite o nome"
+                        onChangeText={setNome} 
+                        value={nome}
+                    />
+                    <TextInput 
+                        style={estilo.input} 
+                        placeholder='É vivo ou morto?' 
+                        onChangeText={setVivoMorto} 
+                        value={vivoMorto}
+                    />
+                    <TextInput 
+                        style={estilo.input} 
+                        placeholder='Digite o valor' 
+                        onChangeText={setValor} 
+                        value={valor}
+                    />
+                    <TouchableOpacity
+                        style={estilo.btnenviar}
+                        onPress={()=>{
+                            addDiario();
+                        }}
+                    >
+                        <Text style={estilo.btntxtenviar}>Enviar</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
             <TouchableOpacity
-            onPress={pickImage}
-            style={estilo.imgpick}
+                onPress={pickImage}
+                style={estilo.imgpick}
             >
-            <Text style ={estilo.titulo}>Images</Text>    
+                <Text style ={estilo.titulo}>Coloque a imagem aqui</Text>    
             </TouchableOpacity>
-
         </View>
     )
-
-}
+};
 
 const estilo = StyleSheet.create({
-container: {
-    flex:1,
-    justifyContent: 'center',
-    alignItems:'center'
-},
-fotos:{
-    width: 200,
-    height: 200
-},
-titulo:{
-    fontSize: 35,
-    marginTop: 50
-},
-imgpick:{
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 20
-}
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 50
+    },
+    titulo: {
+        fontSize: 35,
+        marginTop: 50,
+        marginBottom: 30
+    },
+    imgpick: {
+        position: 'absolute',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 20
+    }
 });
