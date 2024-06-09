@@ -4,17 +4,18 @@ import {
   StyleSheet,
   FlatList,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native';
 import { useFonts, PirataOne_400Regular } from '@expo-google-fonts/pirata-one';
 import { DellaRespira_400Regular } from '@expo-google-fonts/della-respira';
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { fire } from '../Firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export default function VerGente() {
+export default function VerGente({navigation}) {
   const [textos, setTextos] = useState([]);
   const [imagens, setImagens] = useState([]);
 
@@ -41,12 +42,27 @@ export default function VerGente() {
       return null;
   }
 
-  async function deletarTexto(id){
-
-    Firebase.collection("textos").doc(id).delete();
-
-    Alert.alert("O texto foi deletado.");
+  async function deletarTexto(id) {
+      try {
+          await deleteDoc(doc(fire, "textos", id));
+          Alert.alert("Sucesso", "O texto foi deletado.");
+          // Atualiza a lista de textos após a exclusão
+          setTextos(prevTextos => prevTextos.filter(texto => texto.id !== id));
+      } catch (error) {
+          Alert.alert("Erro", "Não foi possível deletar o texto.");
+      }
   }
+
+  async function deletarImg(id) {
+    try {
+        await deleteDoc(doc(fire, "img", id));
+        Alert.alert("Sucesso", "A imagem foi deletado.");
+        // Atualiza a lista de textos após a exclusão
+        setImagens(prevImagens => prevImagens.filter(img => img.id !== id));
+    } catch (error) {
+        Alert.alert("Erro", "Não foi possível deletar o texto.");
+    }
+}
 
   return (
       <SafeAreaView style={styles.container}>
@@ -56,14 +72,12 @@ export default function VerGente() {
                   style={styles.principal}
               />
           </View>
-              <View style={styles.containerTexto}>
-                  <Text style={styles.titulo}>
-                      {/* Título aqui */}
-                  </Text>
-              </View>
-
-              <View style={{flex: 1, width: '70%'}}>
-
+          <View style={styles.containerTexto}>
+              <Text style={styles.titulo}>
+                  {/* Título aqui */}
+              </Text>
+          </View>
+          <View style={{ flex: 1, width: '70%' }}>
               <Text style={styles.subtitulo}>Textos</Text>
               <FlatList
                   data={textos}
@@ -71,22 +85,23 @@ export default function VerGente() {
                   keyExtractor={(item, index) => index.toString()}
                   renderItem={({ item }) => (
                       <View style={styles.item}>
+                        <TouchableOpacity onPress={()=>navigation.navigate("editar", {
+                          id: item.id,
+                          nome: item.nome,
+                          vivoMorto: item.vivoMorto,
+                          valor: item.valor
+                        })}>
                           <Text>{item.nome}</Text>
                           <Text>{item.vivoMorto}</Text>
                           <Text>{item.valor}</Text>
+                        </TouchableOpacity>
 
-                          <View>
-                            <TouchableOpacity onPress={()=>{deletarTexto(item.id)}}>
-                            <MaterialCommunityIcons name="delete-empty" size={70} color="red" />
-                            </TouchableOpacity>
-                            </View>
+                          <TouchableOpacity onPress={() => deletarTexto(item.id)}>
+                              <MaterialCommunityIcons name="delete-empty" size={70} color="red" />
+                          </TouchableOpacity>
                       </View>
-
-
                   )}
               />
-              
-
               <Text style={styles.subtitulo}>Imagens</Text>
               <FlatList
                   data={imagens}
@@ -94,11 +109,13 @@ export default function VerGente() {
                   renderItem={({ item }) => (
                       <View style={styles.item}>
                           <Image source={{ uri: item.url }} style={styles.image} />
+                          <TouchableOpacity onPress={() => deletarImg(item.id)}>
+                              <MaterialCommunityIcons name="delete-empty" size={70} color="red" />
+                          </TouchableOpacity>
                       </View>
                   )}
               />
-
-              </View>
+          </View>
       </SafeAreaView>
   );
 }
@@ -138,15 +155,17 @@ const styles = StyleSheet.create({
       textAlign: 'center',
   },
   item: {
-      marginBottom: 20,
-      padding: 20,
-      backgroundColor: '#fff',
-      borderRadius: 10,
-      shadowColor: '#000',
-      shadowOpacity: 0.2,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: 5 },
-      elevation: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginBottom: 20,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
   },
   image: {
       resizeMode: 'stretch',

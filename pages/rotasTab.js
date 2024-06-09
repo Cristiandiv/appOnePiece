@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CadGente from './cadGente';
 import Home from './Home';
 import VerGente from './verGente';
+import EditGente from './editGente';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +34,11 @@ export default function RotasTab() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="skull" color={color} size={size} />
           ),
+        }}
+      />
+      <Tab.Screen name="editar" component={EditGente}
+              options={{
+          tabBarVisibilityAnimationConfig: false
         }}
       />
     </Tab.Navigator>

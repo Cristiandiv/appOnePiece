@@ -91,10 +91,18 @@ export default function CadGente({ navigation }) {
 
     return (
         <View style={estilo.container}>
+            <View>
             <Text style={estilo.titulo}>Cadastro de Recompensas</Text>
-            <View style={estilo.container}>
+            </View>
+            
+            <TouchableOpacity
+                onPress={pickImage}
+                style={estilo.imgpick}
+            >
+                <Text style ={estilo.titulo}>Coloque a imagem aqui</Text>    
+            </TouchableOpacity>
 
-                <View>
+                <View style={{borderRadius: 15, borderWidth: 3, padding: 30, justifyContent: 'flex-start'}}>
                     <TextInput 
                         autoCapitalize='words' 
                         style={estilo.input} 
@@ -115,7 +123,7 @@ export default function CadGente({ navigation }) {
                         value={valor}
                     />
                     <TouchableOpacity
-                        style={estilo.btnenviar}
+                        style={{margin: 6, backgroundColor: 'cyan', padding: 4, borderRadius: 12, borderWidth: 2, borderColor: '#ff900e'}}
                         onPress={()=>{
                             addDiario();
                         }}
@@ -123,13 +131,7 @@ export default function CadGente({ navigation }) {
                         <Text style={estilo.btntxtenviar}>Enviar</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
-            <TouchableOpacity
-                onPress={pickImage}
-                style={estilo.imgpick}
-            >
-                <Text style ={estilo.titulo}>Coloque a imagem aqui</Text>    
-            </TouchableOpacity>
+            
         </View>
     )
 };
@@ -137,19 +139,23 @@ export default function CadGente({ navigation }) {
 const estilo = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'space-evenly',
         alignItems: 'center',
-        marginTop: 50
+    },
+
+    input: {
+        margin: 6,
+        padding: 4,
+        borderRadius: 10,
+        borderWidth: 2
     },
     titulo: {
-        fontSize: 35,
-        marginTop: 50,
-        marginBottom: 30
+        fontSize: 25,
     },
     imgpick: {
-        position: 'absolute',
-        justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20
+        borderRadius: 20,
+        borderWidth: 2,
+        borderColor: '#000'
     }
 });
