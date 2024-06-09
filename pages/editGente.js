@@ -19,7 +19,7 @@ export default function EditGente({ navigation, route }) {
                 vivoMorto: vivoMorto,
                 valor: valor,
             });
-            Alert.alert("Aviso", "Diário alterado com sucesso.");
+            Alert.alert("Aviso", "Texto alterado com sucesso.");
             navigation.navigate("verDados");
         } catch (error) {
             console.error("Erro ao alterar o diário: ", error);

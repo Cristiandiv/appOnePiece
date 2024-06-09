@@ -5,14 +5,14 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  Alert
+  Alert,
+  SafeAreaView
 } from 'react-native';
 import { useFonts, PirataOne_400Regular } from '@expo-google-fonts/pirata-one';
 import { DellaRespira_400Regular } from '@expo-google-fonts/della-respira';
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { fire } from '../Firebase';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function VerGente({navigation}) {
@@ -66,26 +66,21 @@ export default function VerGente({navigation}) {
 
   return (
       <SafeAreaView style={styles.container}>
-          <View style={styles.containerTitulo}>
-              <Image
-                  source={require('../assets/op.png')}
-                  style={styles.principal}
-              />
-          </View>
+        
           <View style={styles.containerTexto}>
               <Text style={styles.titulo}>
-                  {/* Título aqui */}
+                  Veja e Altere os dados
               </Text>
           </View>
-          <View style={{ flex: 1, width: '70%' }}>
+          <View style={{ flex: 1, width: '90%' }}>
               <Text style={styles.subtitulo}>Textos</Text>
               <FlatList
                   data={textos}
                   style={{}}
                   keyExtractor={(item, index) => index.toString()}
                   renderItem={({ item }) => (
-                      <View style={styles.item}>
-                        <TouchableOpacity onPress={()=>navigation.navigate("editar", {
+                      <View style={[styles.itemTextos]}>
+                        <TouchableOpacity onPress={()=>navigation.navigate("Editar", {
                           id: item.id,
                           nome: item.nome,
                           vivoMorto: item.vivoMorto,
@@ -107,7 +102,7 @@ export default function VerGente({navigation}) {
                   data={imagens}
                   keyExtractor={(item, index) => index.toString()}
                   renderItem={({ item }) => (
-                      <View style={styles.item}>
+                      <View style={styles.itemImg}>
                           <Image source={{ uri: item.url }} style={styles.image} />
                           <TouchableOpacity onPress={() => deletarImg(item.id)}>
                               <MaterialCommunityIcons name="delete-empty" size={70} color="red" />
@@ -131,7 +126,7 @@ const styles = StyleSheet.create({
   },
   principal: {
       width: 310,
-      height: 110,
+      height: 80,
       borderRadius: 10,
   },
   containerTexto: {
@@ -154,12 +149,26 @@ const styles = StyleSheet.create({
       marginVertical: 20,
       textAlign: 'center',
   },
-  item: {
+  itemImg: {
+    height: 400,
+    justifyContent: 'space-evenly',
+    marginBottom: 20,
+    padding: 20,
+    backgroundColor: '#dcdcdc',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
+  },
+
+  itemTextos: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginBottom: 20,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#dcdcdc',
     borderRadius: 10,
     shadowColor: '#000',
     shadowOpacity: 0.2,

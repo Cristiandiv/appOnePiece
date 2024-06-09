@@ -7,6 +7,7 @@ import VerGente from './verGente';
 import EditGente from './editGente';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 export default function RotasTab() {
   return (
