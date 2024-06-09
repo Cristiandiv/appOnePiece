@@ -3,7 +3,6 @@ import {
     Image,
     StyleSheet,
     ScrollView,
-    SafeAreaView,
     FlatList,
     Text,
     ImageBackground

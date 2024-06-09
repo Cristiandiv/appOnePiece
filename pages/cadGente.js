@@ -1,35 +1,36 @@
 import { useEffect, useState } from 'react';
-import { View, Image, TextInput, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { collection, addDoc, onSnapshot } from 'firebase/firestore';
 import * as ImagePicker from "expo-image-picker";
-import { Firebase, storage, fire, dbstore } from '../Firebase';
+import { storage, fire } from '../Firebase';
 
-export default function cadGente({ navigation }) {
-    const [nome, setNome] = useState(null);
-    const [vivoMorto, setVivoMorto] = useState(null);  
-    const [valor, setValor] = useState(null);
-    const [imgUrl, setImgUrl] = useState(null);
+export default function CadGente({ navigation }) {
+    const [nome, setNome] = useState('');
+    const [vivoMorto, setVivoMorto] = useState('');  
+    const [valor, setValor] = useState('');
 
     const [img, setImg] = useState('');
     const [file, setFile] = useState([]);
 
-    function addDiario(){
-        Firebase.collection('onePiece2').add({
+    async function addDiario(){
+        try{
+        await addDoc(collection(fire, 'textos'),{
             nome: nome,
             vivoMorto: vivoMorto,
             valor: valor,
         });
-            setNome('')
-            setVivoMorto('')
-            setValor('')
             Alert.alert('Cadastro', 'Recompensa cadastrada com sucesso');
-            navigation.navigate('Home')
+            navigation.navigate('Homepage')
+    } catch (error){
+        console.error("Error adding document: ", error);
+            Alert.alert('Erro', 'Não foi possível cadastrar a recompensa');
     }
+}
 
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(fire, "onePiece"), (snapshot) => {
+        const unsubscribe = onSnapshot(collection(fire, "img"), (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     setFile((prevFiles) => [...prevFiles, change.doc.data()]);
@@ -62,7 +63,7 @@ export default function cadGente({ navigation }) {
 
     async function saveRecord(fileType, url, createdAt) {
         try {
-            const docRef = await addDoc(collection(fire, "onePiece"), {
+            const docRef = await addDoc(collection(fire, "img"), {
                 fileType,
                 url,
                 createdAt,

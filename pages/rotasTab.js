@@ -1,9 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import CadGente from '../pages/cadGente';
-import Home from '../pages/home';
-import VerGente from '../pages/verGente';
+import CadGente from './cadGente';
+import Home from './Home';
+import VerGente from './verGente';
 
 const Tab = createBottomTabNavigator();
 
@@ -13,7 +13,7 @@ export default function RotasTab() {
       initialRouteName= "Homepage"
       screenOptions={{ headerShown: false ,  tabBarStyle: { position: 'fixed', zIndex: -1 }, }}>
       <Tab.Screen
-        name="Cadastrar a Recompensa"
+        name="cadastrar"
         component={CadGente}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -28,7 +28,7 @@ export default function RotasTab() {
           ),
         }}
       />
-      <Tab.Screen name="Ver Recompensas" component={VerGente}
+      <Tab.Screen name="verDados" component={VerGente}
               options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="skull" color={color} size={size} />

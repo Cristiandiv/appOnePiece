@@ -13,25 +13,25 @@ import {
   import { Audio } from 'expo-av';
   import React, { useEffect } from 'react';
   
-  export default function Home() {
-      useEffect(() => {
-      async function playBackgroundAudio() {
-        try {
-          const backgroundSound = new Audio.Sound();
-          await backgroundSound.loadAsync(require('../assets/weare.mp3'));
-          await backgroundSound.setIsLoopingAsync(true);
-          await backgroundSound.playAsync();
-        } catch (error) {
-          console.log('Erro ao reproduzir áudio de fundo:', error);
-        }
-      }
+  export default function Home({navigation}) {
+    //   useEffect(() => {
+    //   async function playBackgroundAudio() {
+    //     try {
+    //       const backgroundSound = new Audio.Sound();
+    //       await backgroundSound.loadAsync(require('../assets/weare.mp3'));
+    //       await backgroundSound.setIsLoopingAsync(true);
+    //       await backgroundSound.playAsync();
+    //     } catch (error) {
+    //       console.log('Erro ao reproduzir áudio de fundo:', error);
+    //     }
+    //   }
   
-      playBackgroundAudio();
+    //   playBackgroundAudio();
   
-      return () => {
+    //   return () => {
   
-      };
-    }, []);
+    //   };
+    // }, []);
   
     let [fontsLoaded, fontError] = useFonts({
       PirataOne_400Regular, DellaRespira_400Regular
@@ -62,8 +62,13 @@ import {
 
             </Text>
 
-            <Image style={styles.img} source={require('../assets/capa-home.png')} />
-        </View>
+            <TouchableOpacity
+            onPress={()=>{navigation.navigate('cadastrar')}}
+            style={{borderRadius: 15, borderWidth: 2, borderColor: '#000', padding: 12, backgroundColor: '#ff900e'}}
+            >
+                <Text style={{fontSize: 20, fontWeight: 'bold', color: '#fff'}}>Aperte Aqui</Text>
+            </TouchableOpacity>
+          </View>
 
       </View>
     );
